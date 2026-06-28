@@ -1,0 +1,13 @@
+# 비밀·자격증명 (n8n Credential에만 보관, repo에 금지)
+.env
+*.secret
+
+# 로그·임시
+*.log
+temp_pr/
+
+# OS·에디터
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
