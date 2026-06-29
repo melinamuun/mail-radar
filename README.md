@@ -9,12 +9,14 @@
 ## 구조
 
 ```
-26.06.29_메일 업무 자동화/
+mail-radar/
 ├─ README.md                     이 문서
 ├─ docs/
 │  ├─ SRS.md                     요구사항 명세 (FR/NFR + 인수조건) — 단일 진실 공급원
 │  ├─ 아키텍처.md                 5노드 데이터 흐름 + Compute Window 순서도
-│  ├─ 합류명세서.md               Given-When-Then 인수조건 (정상·예외·롤백)
+│  ├─ 합류명세서.md               Given-When-Then 인수조건 (정상·예외·롤백) + 한계표
+│  ├─ UI-UX-화면설계서.md          [프론트 F1] 대시보드 디자인 토큰·레이아웃·Breakpoint Map
+│  ├─ 상태-이벤트-흐름도.md         [프론트 F2] 클라이언트 상태·이벤트·렌더 + XSS(L-5)
 │  └─ 수신_메일_대시보드_프로젝트_프롬프트.md   킥오프 문서(배경·결정)
 └─ n8n/
    └─ inbox-dashboard-n8n-workflow.json   n8n 워크플로 (5노드)
