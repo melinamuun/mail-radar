@@ -47,6 +47,9 @@ const cases = [
   { ac: 'AC-5.3', desc: 'CI 실패(키워드 무) → 격상', name: 'GitHub', email: 'notifications@github.com', subj: 'Run failed: build #42', expect: { cat: 'action', prio: 'high' } },
   // 우선순위(검사 순서) 잠금: security 키워드 + news 키워드 동시 → security 우선
   { ac: 'AC-5.x', desc: '보안+뉴스 동시 → security 우선', name: 'G', email: 'no-reply@accounts.google.com', subj: '보안 알림 newsletter', expect: { cat: 'security', prio: 'low' } },
+  // L-6 회귀 잠금: 'mission' 제거로 submission/commission 오매칭 없음
+  { ac: 'L-6', desc: "'submission' → outlier 오매칭 없음(격상)", name: '지원자', email: 'a@b.com', subj: 'Your submission was received', expect: { cat: 'action', prio: 'high' } },
+  { ac: 'L-6', desc: "'commission' → outlier 오매칭 없음(격상)", name: '동료', email: 'a@b.com', subj: 'commission report draft', expect: { cat: 'action', prio: 'high' } },
 ];
 
 // --- 3. 실행 ---
@@ -59,14 +62,7 @@ for (const c of cases) {
     (ok ? '' : `  (기대: ${c.expect.cat}/${c.expect.prio})`));
 }
 
-// --- 4. 알려진 주의(서브스트링 부작용) — 빌드 실패시키지 않고 정보만 ---
-const caveats = [
-  { desc: "'mission' → 'submission'/'commission' 오매칭 가능", probe: classify('x', 'x@y.com', 'Your submission was received').cat },
-];
-console.log('\n주의(미수정 한계):');
-for (const cav of caveats) console.log(`  - ${cav.desc} | 현재 결과 cat=${cav.probe}`);
-
-// --- 5. 결과 ---
+// --- 4. 결과 ---
 console.log(`\n${cases.length - fail}/${cases.length} 통과`);
 if (fail) { console.error(`✗ 회귀 실패 ${fail}건`); process.exit(1); }
 console.log('✓ 전체 통과');
