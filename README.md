@@ -53,6 +53,14 @@ mail-radar/
 
 배포 전 검증할 위험 2건은 [docs/합류명세서.md](docs/합류명세서.md) AC-3.2(0건 처리)·AC-8.1(본문 HTML 렌더) 참고.
 
+## 테스트
+
+```
+node tests/classify.test.js
+```
+
+분류 로직 회귀 테스트(SRS NFR-7). 워크플로 JSON에서 실제 `classify()`를 추출해 픽스처로 검증하므로 로직 드리프트가 없다. 분류 규칙을 바꾸면 이 테스트로 회귀를 확인한다. 의존성 없음(Node 내장만).
+
 ## 환경·제약
 
 - 실행기: n8n (Python·venv 의존 없음 → `requirements.txt` 해당 없음)
