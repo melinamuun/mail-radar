@@ -16,10 +16,14 @@ mail-radar/
 │  ├─ 아키텍처.md                 5노드 데이터 흐름 + Compute Window 순서도
 │  ├─ 합류명세서.md               Given-When-Then 인수조건 (정상·예외·롤백) + 한계표
 │  ├─ UI-UX-화면설계서.md          [프론트 F1] 대시보드 디자인 토큰·레이아웃·Breakpoint Map
-│  ├─ 상태-이벤트-흐름도.md         [프론트 F2] 클라이언트 상태·이벤트·렌더 + XSS(L-5)
+│  ├─ 상태-이벤트-흐름도.md         [프론트 F2] 클라이언트 상태·이벤트(위임)·렌더 + XSS
+│  ├─ 배포가이드.md                 n8n 임포트·OAuth·Error Trigger·수동 테스트 절차
 │  └─ 수신_메일_대시보드_프로젝트_프롬프트.md   킥오프 문서(배경·결정)
-└─ n8n/
-   └─ inbox-dashboard-n8n-workflow.json   n8n 워크플로 (5노드)
+├─ n8n/
+│  ├─ inbox-dashboard-n8n-workflow.json   본체 워크플로 (5노드)
+│  └─ error-handler-workflow.json         에러 알림 워크플로 (NFR-8)
+└─ tests/
+   └─ classify.test.js              분류 회귀 테스트 (NFR-7)
 ```
 
 ## 아키텍처 요약
@@ -38,20 +42,21 @@ mail-radar/
 
 | 항목 | 상태 |
 |---|---|
-| 설계 문서(SRS·아키텍처·합류명세서) | 완료 |
-| n8n 워크플로 | 완료 · **미배포** |
-| 실제 배포(임포트·자격증명·Active) | 미완 |
+| 설계 문서(SRS v1.2·아키텍처·합류명세서·F1·F2·배포가이드) | 완료 |
+| 코드 마감(L-5 XSS·L-6 분류·이벤트 위임·회귀 테스트) | 완료 |
+| 배포 산출물(본체 + 에러 알림 워크플로) | 준비 완료 |
+| 실제 배포(임포트·자격증명·Active) | **본인 수동 단계** — 배포가이드 참조 |
 
 ## 배포 (요약)
 
-1. n8n에서 `n8n/inbox-dashboard-n8n-workflow.json` 임포트
-2. Gmail OAuth2 자격증명 연결 — 조회·발송 2노드(동일 자격증명)
+1. 본체 `n8n/inbox-dashboard-n8n-workflow.json` 임포트
+2. Gmail OAuth2 자격증명 — 조회·발송 2노드(동일 자격증명)
 3. Compute Window 노드의 `selfEmail` 확인
-4. 수동 Execute로 테스트 메일 수신 확인(본문 표 + 첨부 HTML)
-5. 타임존 `Asia/Seoul` 확인 → Active ON
-6. 호스트 상시 가동 (권장: Synology NAS · Docker)
+4. 에러 알림 `n8n/error-handler-workflow.json` 임포트 → 본체 Settings의 Error Workflow로 지정(NFR-8)
+5. 수동 Execute로 테스트(본문 표·첨부 HTML·XSS·0건·발신 제외)
+6. 타임존 `Asia/Seoul` → Active ON, 호스트 상시 가동(NAS 권장)
 
-배포 전 검증할 위험 2건은 [docs/합류명세서.md](docs/합류명세서.md) AC-3.2(0건 처리)·AC-8.1(본문 HTML 렌더) 참고.
+**상세 절차·체크리스트는 [docs/배포가이드.md](docs/배포가이드.md).** 배포 전 검증 위험은 [docs/합류명세서.md](docs/합류명세서.md) AC-3.2(0건)·AC-8.1(본문 HTML) 참고.
 
 ## 테스트
 
