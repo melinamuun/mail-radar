@@ -61,10 +61,11 @@ mail-radar/
 ## 테스트
 
 ```
-node tests/classify.test.js
+node tests/classify.test.js   # 분류 규칙 회귀 (18케이스)
+node tests/extract.test.js     # Build Dashboard 필드 추출 회귀 (n8n Gmail 형식, 11케이스)
 ```
 
-분류 로직 회귀 테스트(SRS NFR-7). 워크플로 JSON에서 실제 `classify()`를 추출해 픽스처로 검증하므로 로직 드리프트가 없다. 분류 규칙을 바꾸면 이 테스트로 회귀를 확인한다. 의존성 없음(Node 내장만).
+두 테스트 모두 워크플로 JSON에서 실제 코드를 추출해 검증하므로 로직 드리프트가 없다(NFR-7). `extract.test.js`는 n8n Gmail 노드의 실제 출력 형식(mailparser: `from:{value:[{address,name}]}`·`subject`·`date`·`text`)을 픽스처로 고정해, 필드 매핑 버그(L-7) 재발을 막는다. 의존성 없음(Node 내장만).
 
 ## 환경·제약
 
