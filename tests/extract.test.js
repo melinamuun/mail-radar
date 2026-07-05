@@ -22,7 +22,7 @@ const code = wf.nodes.find(n => n.name === 'Build Dashboard').parameters.jsCode;
 // n8n Gmail(mailparser) 형식 헬퍼
 const addr = (name, address) => ({ value: [{ address, name }], text: `"${name}" <${address}>` });
 const items = [
-  { json: { labelIds: ['INBOX', 'UNREAD'], from: addr('DAILY_BYTE', 'byteteam365@mydailybyte.com'), subject: '(광고) 하반기 변화 10가지', date: '2026-06-30T20:32:17.000Z', text: '본문 내용' } },
+  { json: { labelIds: ['INBOX', 'UNREAD'], from: addr('DAILY_BYTE', 'byteteam365@mydailybyte.com'), subject: '(광고) 하반기 변화 10가지', date: '2026-06-30T20:32:17.000Z', text: '[https://track.pixel.com/a.ashx?id=1] ━━━━━ 하반기 변화 요약입니다' } },
   { json: { labelIds: ['INBOX', 'UNREAD'], from: addr('Coursera', 'Coursera@m.learn.coursera.org'), subject: 'Start Writing Prompts', date: '2026-06-30T19:37:05.000Z', text: '강좌 안내' } },
   { json: { labelIds: ['INBOX'], from: addr('Google', 'no-reply@accounts.google.com'), subject: '보안 알림', date: '2026-06-30T10:00:00.000Z', text: '새 로그인' } },
   { json: { labelIds: ['INBOX', 'UNREAD'], from: addr('김동료', 'colleague@gmail.com'), subject: '내일 회의 가능하세요?', date: '2026-06-30T09:00:00.000Z', text: '3시 어때요' } },
@@ -52,7 +52,8 @@ check('보안 알림 → security', byCat('security').length >= 1);
 check('개인 메일 → action 격상', byCat('action').some(m => m.from === '김동료'));
 check('전부 action 아님(분류 다양)', new Set(mails.map(m => m.cat)).size > 1);
 check('XSS 이스케이프(&lt;img 有, onerror 실행형 無)', html.includes('&lt;img') && !/<img[^>]*onerror=/i.test(html));
+check('snip 정제 (URL·구분선 제거, L-8)', mails.every(m => !/https?:\/\//.test(m.snip)) && mails.some(m => m.subj.includes('광고') && m.snip.includes('요약')));
 
-console.log(`\n${mails.length - 0}건 처리 · ${11 - fail}/11 검증 통과`);
+console.log(`\n${mails.length - 0}건 처리 · ${12 - fail}/12 검증 통과`);
 if (fail) { console.error(`✗ 실패 ${fail}건`); process.exit(1); }
 console.log('✓ 전체 통과');
