@@ -1,0 +1,109 @@
+{
+  "name": "메일 레이더 — 실시간 패스트트랙 (ntfy)",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {}
+      },
+      "id": "ft-gmail",
+      "name": "Gmail 실시간 감시",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "// 실시간 긴급 게이트 — 발신자 화이트리스트 AND 긴급 키워드 (교집합, 좁게 유지)\n// 아래 두 배열만 본인 상황에 맞게 수정하세요.\nconst WHITELIST = ['@school.ac.kr', 'boss@company.com'];  // 발신자 주소 또는 도메인\nconst URGENT = ['긴급', '마감', '즉시', 'urgent', 'asap', 'deadline'];\n\nreturn items.filter((it) => {\n  const j = it.json;\n  const from = (((j.from && j.from.value && j.from.value[0] && j.from.value[0].address) || j.from || '') + '').toLowerCase();\n  const subj = ((j.subject || '') + '').toLowerCase();\n  const senderOK = WHITELIST.some((w) => from.includes(w.toLowerCase()));\n  const urgentOK = URGENT.some((k) => subj.includes(k.toLowerCase()));\n  return senderOK && urgentOK;  // 둘 다 만족해야 통과\n});"
+      },
+      "id": "ft-gate",
+      "name": "긴급 게이트 (화이트리스트 AND 키워드)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ntfy.sh/YOUR_NTFY_TOPIC",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Title",
+              "value": "URGENT mail"
+            },
+            {
+              "name": "Priority",
+              "value": "urgent"
+            },
+            {
+              "name": "Tags",
+              "value": "rotating_light"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/plain; charset=utf-8",
+        "body": "=🚨 긴급 메일\n보낸이: {{ $json.from.value[0].name }} <{{ $json.from.value[0].address }}>\n제목: {{ $json.subject }}",
+        "options": {}
+      },
+      "id": "ft-ntfy",
+      "name": "ntfy 긴급 경보",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Gmail 실시간 감시": {
+      "main": [
+        [
+          {
+            "node": "긴급 게이트 (화이트리스트 AND 키워드)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "긴급 게이트 (화이트리스트 AND 키워드)": {
+      "main": [
+        [
+          {
+            "node": "ntfy 긴급 경보",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Seoul"
+  },
+  "meta": {
+    "templatecredsSetupCompleted": false
+  }
+}

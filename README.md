@@ -21,10 +21,14 @@ mail-radar/
 │  └─ 수신_메일_대시보드_프로젝트_프롬프트.md   킥오프 문서(배경·결정)
 ├─ n8n/
 │  ├─ inbox-dashboard-n8n-workflow.json   본체 워크플로 (5노드)
-│  └─ error-handler-workflow.json         에러 알림 워크플로 (NFR-8)
+│  ├─ error-handler-ntfy-workflow.json    에러 알림 → ntfy (NFR-8, Gmail 독립)
+│  └─ fast-track-ntfy-workflow.json       실시간 긴급 → ntfy (FR-10, 화이트리스트 AND 키워드)
 └─ tests/
-   └─ classify.test.js              분류 회귀 테스트 (NFR-7)
+   ├─ classify.test.js              분류 회귀 테스트 (NFR-7)
+   └─ extract.test.js               필드 추출 회귀 테스트 (n8n Gmail 형식, L-7)
 ```
+
+> ntfy 워크플로의 URL은 `https://ntfy.sh/YOUR_NTFY_TOPIC` **placeholder**다(공개 레포 노출 방지, AC-NFR5.2). n8n 임포트 후 실제 토픽으로 바꾼다. 패스트트랙은 `긴급 게이트` 코드 노드의 `WHITELIST`·`URGENT` 배열을 본인 상황에 맞게 수정한다(엄격히 좁게).
 
 ## 아키텍처 요약
 

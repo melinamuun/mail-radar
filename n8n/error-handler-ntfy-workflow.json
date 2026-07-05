@@ -1,0 +1,73 @@
+{
+  "name": "메일 레이더 — 에러 알림 (ntfy)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "err-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ntfy.sh/YOUR_NTFY_TOPIC",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Title",
+              "value": "Mail Radar FAILED"
+            },
+            {
+              "name": "Priority",
+              "value": "urgent"
+            },
+            {
+              "name": "Tags",
+              "value": "warning"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/plain; charset=utf-8",
+        "body": "=[실행 실패] {{ $json.workflow.name }}\n노드: {{ $json.execution.lastNodeExecuted }}\n오류: {{ $json.execution.error.message }}",
+        "options": {}
+      },
+      "id": "err-ntfy",
+      "name": "ntfy 실패 경보",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "ntfy 실패 경보",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Seoul"
+  },
+  "meta": {
+    "templatecredsSetupCompleted": false
+  }
+}
