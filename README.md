@@ -28,7 +28,7 @@ mail-radar/
    └─ extract.test.js               필드 추출 회귀 테스트 (n8n Gmail 형식, L-7)
 ```
 
-> ntfy 워크플로의 URL은 `https://ntfy.sh/YOUR_NTFY_TOPIC` **placeholder**다(공개 레포 노출 방지, AC-NFR5.2). n8n 임포트 후 실제 토픽으로 바꾼다. 패스트트랙은 `긴급 게이트` 코드 노드의 `WHITELIST`·`URGENT` 배열을 본인 상황에 맞게 수정한다(엄격히 좁게).
+> ntfy 워크플로의 URL은 `https://ntfy.sh/YOUR_NTFY_TOPIC` **placeholder**다(공개 레포 노출 방지, AC-NFR5.2). n8n 임포트 후 실제 토픽으로 바꾼다. 패스트트랙 `긴급 게이트`는 4경로 사이렌 — 경로1 신뢰발신자(`WHITELIST`)+긴급어(`URGENT`), 경로2 비즈니스 기회(`BIZ`, 광고 제외), 경로3 큰 금액 결제(`PAY`+`PAY_MIN`), 경로4 기한 있음(`DEADLINE`, 광고 제외). 각 상수 배열을 본인 상황에 맞게 좁게 조정한다(AC-10.3).
 
 ## 아키텍처 요약
 
