@@ -26,7 +26,7 @@
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
-        "jsCode": "// 실시간 긴급 게이트 — 4경로. 아래 상수만 본인 상황에 맞게 수정하세요(좁게 유지).\nconst WHITELIST = ['@cau.ac.kr', 'soobin7612@gmail.com'];   // [경로1] 신뢰 발신자 주소/도메인\nconst URGENT    = ['마감','오늘까지','긴급','합격','면접','최종','실패','만료']; // [경로1] 긴급 키워드\nconst BIZ       = ['협업','촬영','섭외','제안','협찬','광고 문의','sponsorship','collaboration']; // [경로2] 비즈니스 기회\nconst PAY       = ['결제','승인','출금','이체','청구','결제완료','payment','charged']; // [경로3] 결제 신호\nconst PAY_MIN   = 100000; // [경로3] '큰 금액' 기준(원)\nconst DEADLINE  = ['마감','기한','까지','신청기간','접수','제출','deadline','due','마감일']; // [경로4] 기한 신호\n\nfunction isAd(from, subj){\n  return /no-?reply|newsletter|beehiiv|mailchimp|substack|mailer|unsubscribe|noreply/i.test(from)\n      || /광고|뉴스레터|할인|세일|프로모|무료체험|promo|sale/i.test(subj);\n}\nfunction bigAmount(text){\n  const re = /(?:₩|\\$)\\s*([\\d,]+)|([\\d,]+)\\s*(?:원|won)/gi;\n  let m; while((m=re.exec(text))){ const n=parseInt((m[1]||m[2]).replace(/,/g,''),10); if(!isNaN(n)&&n>=PAY_MIN) return true; }\n  return false;\n}\nreturn items.filter((it)=>{\n  const j = it.json;\n  const from = (((j.from&&j.from.value&&j.from.value[0]&&j.from.value[0].address)||j.from||'')+'').toLowerCase();\n  const subjRaw = (j.subject||'')+'';\n  const subj = subjRaw.toLowerCase();\n  const hay = subjRaw + ' ' + ((j.text||'')+'');\n  const ad = isAd(from, subjRaw);\n  if (WHITELIST.some(w=>from.includes(w.toLowerCase())) && URGENT.some(k=>subj.includes(k.toLowerCase()))) return true; // 경로1: 신뢰발신+긴급\n  if (BIZ.some(k=>subj.includes(k.toLowerCase()))) return true;            // 경로2: 비즈니스 기회 (광고여도 포함 — 국내 협업 메일은 (광고) 표기 의무)\n  if (PAY.some(k=>subj.includes(k.toLowerCase())) && bigAmount(hay)) return true; // 경로3: 큰 금액 결제\n  if (!ad && DEADLINE.some(k=>subj.includes(k.toLowerCase()))) return true; // 경로4: 기한 있음(광고 아님)\n  return false;\n});"
+        "jsCode": "// 실시간 긴급 게이트 — 4경로. 아래 상수만 본인 상황에 맞게 수정하세요(좁게 유지).\nconst WHITELIST = ['@cau.ac.kr', 'soobin7612@gmail.com'];   // [경로1] 신뢰 발신자 주소/도메인\nconst URGENT    = ['마감','오늘까지','긴급','합격','면접','최종','실패','만료']; // [경로1] 긴급 키워드\nconst BIZ       = ['협업','촬영','섭외','제안','협찬','광고 문의','sponsorship','collaboration']; // [경로2] 비즈니스 기회\nconst PAY       = ['결제','승인','출금','이체','청구','결제완료','payment','charged']; // [경로3] 결제 신호\nconst PAY_MIN   = 100000; // [경로3] '큰 금액' 기준(원)\nconst DEADLINE  = ['마감','기한','까지','신청기간','접수','제출','deadline','due','마감일']; // [경로4] 기한 신호\n\nfunction isAd(from, subj){\n  return /no-?reply|newsletter|beehiiv|mailchimp|substack|mailer|unsubscribe|noreply/i.test(from)\n      || /광고|뉴스레터|할인|세일|프로모|무료체험|promo|sale/i.test(subj);\n}\nfunction bigAmount(text){\n  const re = /(?:₩|\\$)\\s*([\\d,]+)|([\\d,]+)\\s*(?:원|won)/gi;\n  let m; while((m=re.exec(text))){ const n=parseInt((m[1]||m[2]).replace(/,/g,''),10); if(!isNaN(n)&&n>=PAY_MIN) return true; }\n  return false;\n}\nfunction clean(s){ return ((s||'')+'').replace(/https?:\\/\\/\\S+/g,'').replace(/[\\[\\]]/g,' ').replace(/[\\u200B-\\u200D\\u2060\\uFEFF]/g,'').replace(/\\s+/g,' ').trim(); }\nfunction passes(j){\n  const from = (((j.from&&j.from.value&&j.from.value[0]&&j.from.value[0].address)||j.from||'')+'').toLowerCase();\n  const subjRaw = (j.subject||'')+'';\n  const subj = subjRaw.toLowerCase();\n  const hay = subjRaw + ' ' + ((j.text||'')+'');\n  const ad = isAd(from, subjRaw);\n  if (WHITELIST.some(w=>from.includes(w.toLowerCase())) && URGENT.some(k=>subj.includes(k.toLowerCase()))) return true; // 경로1: 신뢰발신+긴급\n  if (BIZ.some(k=>subj.includes(k.toLowerCase()))) return true;            // 경로2: 비즈니스 기회 (광고여도 포함 — 국내 협업 메일은 (광고) 표기 의무)\n  if (PAY.some(k=>subj.includes(k.toLowerCase())) && bigAmount(hay)) return true; // 경로3: 큰 금액 결제\n  if (!ad && DEADLINE.some(k=>subj.includes(k.toLowerCase()))) return true; // 경로4: 기한 있음(광고 아님)\n  return false;\n}\n// 통과 메일에 알림 본문(마크다운) + Gmail 딥링크를 붙여서 넘긴다.\nreturn items.filter((it)=>passes(it.json)).map((it)=>{\n  const j = it.json;\n  const v = (j.from && j.from.value && j.from.value[0]) || {};\n  const name = ((v.name||v.address||'')+'');\n  const email = ((v.address||'')+'');\n  const subj = (j.subject||'')+'';\n  const preview = clean(j.text).slice(0,140);\n  const id = ((j.id||j.threadId||'')+'');\n  j._gmailLink = id ? ('https://mail.google.com/mail/u/0/#all/'+id) : 'https://mail.google.com/mail/u/0/#inbox';\n  j._alertBody = '**'+subj+'**\\n'+name+(email?(' <'+email+'>'):'')+(preview?('\\n\\n'+preview):'');\n  return it;\n});"
       },
       "id": "ft-gate",
       "name": "긴급 게이트 (화이트리스트 AND 키워드)",
@@ -46,7 +46,7 @@
           "parameters": [
             {
               "name": "Title",
-              "value": "URGENT mail"
+              "value": "Mail Radar"
             },
             {
               "name": "Priority",
@@ -55,13 +55,21 @@
             {
               "name": "Tags",
               "value": "rotating_light"
+            },
+            {
+              "name": "Markdown",
+              "value": "yes"
+            },
+            {
+              "name": "Click",
+              "value": "={{ $json._gmailLink }}"
             }
           ]
         },
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "text/plain; charset=utf-8",
-        "body": "=🚨 긴급 메일\n보낸이: {{ $json.from.value[0].name }} <{{ $json.from.value[0].address }}>\n제목: {{ $json.subject }}",
+        "body": "={{ $json._alertBody }}",
         "options": {}
       },
       "id": "ft-ntfy",
