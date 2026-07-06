@@ -11,3 +11,6 @@ temp_pr/
 Thumbs.db
 desktop.ini
 .vscode/
+
+# 이 PC 전용 실행기(로컬 경로 박힘) — 커밋 금지
+mail-radar-n8n.cmd
